@@ -1,0 +1,16 @@
+﻿.fillpage {
+    overflow: hidden; /* Hide scrollbars */
+    height: 100%;
+    width: 100%;
+    padding: 0px;
+    border: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.container body-content, #maincanvas {
+    width: 100%;
+    height: 100%;
+}

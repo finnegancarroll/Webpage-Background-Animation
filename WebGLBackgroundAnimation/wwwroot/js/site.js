@@ -1,0 +1,19 @@
+﻿main();
+
+function main() {
+    const canvas = document.querySelector('#maincanvas');
+    // Initialize the GL context
+    const gl = canvas.getContext('webgl');
+    gl.canvas.width = window.innerWidth;
+    gl.canvas.height = window.innerHeight;
+
+    if (!gl) {
+        alert('Unable to initialize WebGL. Your browser or machine may not support it.');
+        return;
+    }
+
+    // Set clear color to black, fully opaque
+    gl.clearColor(1.0, 0.0, 1.0, 1.0);
+    // Clear the color buffer with specified clear color
+    gl.clear(gl.COLOR_BUFFER_BIT);
+}
