@@ -1,6 +1,27 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 
+<!-- Vertex Shader -->
+<script id="vertexshader" type="notjs">
+
+    attribute vec4 a_position;
+    void main() {
+        gl_Position = a_position;
+    }
+
+</script>
+
+<!-- Pixel Shader -->
+<script id="pixelshader" type="notjs">
+
+    precision mediump float;
+    void main() {
+        //Set pixel color to purple
+        gl_FragColor = vec4(1, 0, 0.5, 1);
+    }
+
+</script>
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
