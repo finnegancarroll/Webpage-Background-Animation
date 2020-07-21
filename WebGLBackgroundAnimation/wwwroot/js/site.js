@@ -15,13 +15,11 @@ function main() {
     //Create shaders
     var vertexShaderSource = document.querySelector("#vertexshader").text;
     var pixelShaderSource = document.querySelector("#pixelshader").text;
-
     var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
     var pixelShader = createShader(gl, gl.FRAGMENT_SHADER, pixelShaderSource);
 
     //Create program
     var program = createProgram(gl, vertexShader, pixelShader);
-
     var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
 
     //Create vertex buffer
@@ -29,11 +27,25 @@ function main() {
     //Bind vertex buffer to GPU "handle"
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
+    //RENDER LOOP STARTS HERE
+
+    // Describes how we iterate through the vertex buffer for rendering
+    var size = 2;          // Dimension of elemends (2d/34,...)
+    var type = gl.FLOAT;   // the data is 32bit floats
+    var normalize = false; // don't normalize the data
+    var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+    var offset = 0;        // start at the beginning of the buffer
+
+    //What/Where/How many?
+    var primitiveType = gl.LINES;
+    var offset = 0;
+    var count = 3;
+
     // three 2d points EXAMPLE
     var positions = [
-        0, 0,
-        0, 0.5,
-        0.7, 0,
+        -1, -1,
+        1, 1,
+        1, -1
     ];
 
     //Load vertices into vertex buffer
@@ -51,18 +63,9 @@ function main() {
     gl.useProgram(program);
     //Enable vertex buffer
     gl.enableVertexAttribArray(positionAttributeLocation);
-
-    // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    var size = 2;          // 2 components per iteration
-    var type = gl.FLOAT;   // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0;        // start at the beginning of the buffer
+    //Set how vertices are pulled out of the buffer for rendering
     gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
 
-    var primitiveType = gl.TRIANGLES;
-    var offset = 0;
-    var count = 3;
     gl.drawArrays(primitiveType, offset, count);
 }
 
