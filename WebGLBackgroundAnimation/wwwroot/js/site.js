@@ -39,13 +39,12 @@ function main() {
     //What/Where/How many?
     var primitiveType = gl.LINES;
     var offset = 0;
-    var count = 3;
+    var count = 2;
 
     // three 2d points EXAMPLE
     var positions = [
         -1, -1,
-        1, 1,
-        1, -1
+        1, 1
     ];
 
     //Load vertices into vertex buffer
