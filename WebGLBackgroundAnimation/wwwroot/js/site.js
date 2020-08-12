@@ -1,7 +1,34 @@
 ﻿//https://webglfundamentals.org/webgl/lessons/webgl-fundamentals.html
+
+var MSINS = 1000;
+
 var canvas = document.querySelector('#maincanvas');
 var gl = canvas.getContext('webgl');
 var program; 
+
+//Verticies of our graph
+var verticies = [
+    [-.9, -.7],
+    [.5, .2],
+    [.5, .2],
+    [.3, -.2]
+];
+
+//The lines connecting verticies of the graph
+//TEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMP
+var edges = [
+    [0, 1],
+    [1, 2],
+    [2, 3]
+]; 
+
+//Each vertex has velocity
+var velocities = [
+    [1, -1],
+    [-1, 1],
+    [1, 0],
+    [0, 1]
+];
 
 function main() {
     gl.canvas.width = window.innerWidth;
@@ -30,10 +57,13 @@ function main() {
     renderLoop();
 }
 
-function render() { 
-    
+function render(fps) { 
+
+    //SOME OF THESE CAN BE CALCULATED??? DONT NEED TO HARDCODE
+    //THOSE THAT ARE HARDCODED CAN JUST GLOBAL CONST IF THEY ARE SPECIFIC TO THIS PROGRAM AND NEVER CHANGED
+
     // Describes how we iterate through the vertex buffer for rendering
-    var size = 2;          // Dimension of elemends (2d/34,...)
+    var size = verticies[0].length;          // Dimension of elemends (2d/34,...)
     var type = gl.FLOAT;   // the data is 32bit floats
     var normalize = false; // don't normalize the data
     var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
@@ -41,13 +71,10 @@ function render() {
     //What/Where/How many?
     var primitiveType = gl.LINES;
     var offset = 0;
-    var count = 2;
+    var vertexCount = verticies.length;
 
-    // three 2d points EXAMPLE
-    var positions = [
-        -1, -1,
-        1, 1
-    ];
+    var timestep = 1 / (fps * 10);
+    updateVerticies(vertexCount, size, timestep);
 
     //Set clear color 
     gl.clearColor(0, 0, 0, 1);
@@ -56,7 +83,7 @@ function render() {
 
     //Load vertices into vertex buffer
     //gl.STATIC_DRAW => We will not be changing these vertices much
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(getLines()), gl.STATIC_DRAW);
 
     //Starting choords and size of screen we will project onto
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -68,14 +95,61 @@ function render() {
     //Set how vertices are pulled out of the buffer for rendering
     gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
 
-    gl.drawArrays(primitiveType, offset, count);
+    gl.drawArrays(primitiveType, offset, vertexCount*size);
 }
+
+//A vertex with multiple edges will be passed to opengl once per edge
+function getLines() {
+    var lines = [];
+
+    //For each edge add the corresponding verticies to the 
+    //list of lines to be drawn
+    for (i = 0; i < edges.length; i++) {
+        var edge = edges[i];
+        //x of first vertex of edge
+        lines.push(verticies[edge[0]][0]);
+        //y of first vertex of edge
+        lines.push(verticies[edge[0]][1]);
+        //x of second vertex of edge
+        lines.push(verticies[edge[1]][0]);
+        //y of second vertex of edge
+        lines.push(verticies[edge[1]][1]);
+    }
+
+    return lines;
+}
+
+
+//Update the positions of verticies based on velocity and timestep
+function updateVerticies(count, size, timestep) {
+
+    //There are "count" many verticies each of dimension "size"
+    //For each we update their position based on their velocity
+    for (i = 0; i < count; i++) {
+        for (j = 0; j < size; j++) {
+
+            //New position out of bounds => reverse velocity
+            //Else update position as normal
+            var newPosition = verticies[i][j] + (timestep * velocities[i][j]);
+            if (Math.abs(newPosition) > 1) {
+                velocities[i][j] = velocities[i][j] * -1;
+                verticies[i][j] = newPosition;
+            } else {
+                verticies[i][j] = newPosition;
+            }
+        }
+    }
+}
+
 
 //Loops the render function
 function renderLoop() {
-    render();
     //Recursive call to renderLoop()
-    window.setTimeout(renderLoop, 1000 / 60);
+    //1000 ms in a second, we will aim for 60 frames a second
+    var fps = 60;
+    var fixedStep = MSINS / fps;
+    render(fps);
+    window.setTimeout(renderLoop, fixedStep);
 }
 
 function createShader(gl, shaderName, source) {
